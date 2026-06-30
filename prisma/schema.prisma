@@ -6,3 +6,26 @@ datasource db {
   provider = "mysql"
 }
 
+enum BbpsOrderStatus {
+  INIT
+  RECHARGING
+  RECHARGED_FAILURE
+  RECHARGED
+  PAYING
+  PAYMENT_FAILURE
+  PAID
+}
+
+model BbpsOrder {
+  orderId             String           @id @map("order_id")
+  userGid             String           @map("user_gid")
+  refId               String           @unique @map("ref_id")
+  billAmount          Decimal          @map("bill_amount") @db.Decimal(18, 2)
+  actualPaymentAmount Decimal          @map("actual_payment_amount") @db.Decimal(18, 2)
+  bbpsOrderStatus     BbpsOrderStatus? @map("bbps_order_status")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @default(now()) @map("updated_at")
+  version             Int              @default(0)
+
+  @@map("bbps_order")
+}
