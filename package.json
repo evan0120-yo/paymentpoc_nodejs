@@ -17,31 +17,31 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "bullmq": "^5.21.2",
-    "egg": "^3.30.0",
-    "egg-scripts": "^2.17.0",
-    "ioredis": "^5.4.1",
-    "mysql2": "^3.11.5",
-    "uuid": "^10.0.0",
-    "zod": "^3.23.8"
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bullmq": "^5.79.2",
+    "egg": "^3.34.0",
+    "egg-scripts": "^3.1.0",
+    "ioredis": "^5.11.1",
+    "mariadb": "^3.5.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "@types/mocha": "^10.0.9",
-    "@types/node": "^22.8.6",
-    "egg-bin": "^6.9.0",
-    "egg-mock": "^5.13.0",
-    "egg-ts-helper": "^2.1.1",
-    "eslint": "^9.13.0",
-    "prettier": "^3.3.3",
-    "prisma": "^5.22.0",
+    "@eslint/js": "^10.0.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.13.2",
+    "egg-bin": "^6.13.0",
+    "egg-mock": "^5.15.2",
+    "egg-ts-helper": "^3.2.0",
+    "eslint": "^10.6.0",
+    "prettier": "^3.9.4",
+    "prisma": "^7.8.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.12.2"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.19.0"
   }
 }
 

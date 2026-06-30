@@ -18,7 +18,13 @@
     "types": ["node", "mocha"],
     "outDir": "dist"
   },
-  "include": ["app/**/*.ts", "config/**/*.ts", "test/**/*.ts", "typings/**/*.ts"],
+  "include": [
+    "app/**/*.ts",
+    "config/**/*.ts",
+    "test/**/*.ts",
+    "typings/**/*.ts",
+    "prisma.config.ts"
+  ],
   "exclude": ["node_modules", "dist", "coverage"]
 }
 
