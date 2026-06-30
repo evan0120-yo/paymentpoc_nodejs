@@ -1,0 +1,47 @@
+{
+  "name": "paymentpoc-nodejs-egg",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "egg-bin dev --ts",
+    "debug": "egg-bin debug --ts",
+    "start": "egg-scripts start --typescript --daemon --title=paymentpoc-nodejs-egg",
+    "stop": "egg-scripts stop --title=paymentpoc-nodejs-egg",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "egg-bin test --ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bullmq": "^5.21.2",
+    "egg": "^3.30.0",
+    "egg-scripts": "^2.17.0",
+    "ioredis": "^5.4.1",
+    "mysql2": "^3.11.5",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.8.6",
+    "egg-bin": "^6.9.0",
+    "egg-mock": "^5.13.0",
+    "egg-ts-helper": "^2.1.1",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.12.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+
