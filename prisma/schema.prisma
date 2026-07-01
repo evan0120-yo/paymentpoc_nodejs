@@ -27,5 +27,68 @@ model BbpsOrder {
   updatedAt           DateTime         @default(now()) @map("updated_at")
   version             Int              @default(0)
 
+  @@index([orderId], name: "idx_order_id")
   @@map("bbps_order")
+}
+
+enum BbpsPaymentStatus {
+  INIT
+  CANCEL
+  PAYING
+  PAID
+  PAYMENT_FAILURE
+}
+
+model BbpsPayment {
+  paymentId           String           @id @map("payment_id")
+  orderId             String           @map("order_id")
+  actualPaymentAmount Decimal          @map("actual_payment_amount") @db.Decimal(18, 2)
+  bbpsPaymentStatus   BbpsPaymentStatus? @map("bbps_payment_status")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @default(now()) @map("updated_at")
+  version             Int              @default(0)
+
+  @@index([orderId], name: "idx_order_id")
+  @@map("bbps_payment")
+}
+
+enum BbpsRechargeStatus {
+  INIT
+  RECHARGING
+  RECHARGED_FAILURE
+  RECHARGED
+}
+
+model BbpsRecharge {
+  rechargeId          String           @id @map("recharge_id")
+  orderId             String           @map("order_id")
+  rechargeInfo           String?          @map("recharge_info") @db.Text
+  bbpsRechargeStatus   BbpsRechargeStatus? @map("bbps_recharge_status")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @default(now()) @map("updated_at")
+  version             Int              @default(0)
+
+  @@index([orderId], name: "idx_order_id")
+  @@map("bbps_recharge")
+}
+
+enum BbpsRefundStatus {
+  INIT
+  PROCESSING
+  SUCCESS
+  FAILURE
+}
+
+model BbpsRefund {
+  refundId          String           @id @map("refund_id")
+  orderId             String           @map("order_id")
+  transactionAmount Decimal          @map("transaction_amount") @db.Decimal(18, 2)
+  refundAmount      Decimal          @map("refund_amount") @db.Decimal(18, 2)
+  bbpsRefundStatus   BbpsRefundStatus? @map("bbps_refund_status")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @default(now()) @map("updated_at")
+  version             Int              @default(0)
+
+  @@index([orderId], name: "idx_order_id")
+  @@map("bbps_refund")
 }
