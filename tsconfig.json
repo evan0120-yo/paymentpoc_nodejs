@@ -19,6 +19,8 @@
     "outDir": "dist"
   },
   "include": [
+    "app.ts",
+    "agent.ts",
     "app/**/*.ts",
     "config/**/*.ts",
     "test/**/*.ts",
