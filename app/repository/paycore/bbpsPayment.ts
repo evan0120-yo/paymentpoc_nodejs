@@ -1,28 +1,36 @@
-import { BaseContextClass } from "egg";
-import type { BbpsPayment, Prisma } from "@prisma/client";
+import { BaseContextClass } from 'egg';
+import { BbpsPaymentStatus } from '@prisma/client';
+import type { BbpsPayment, Prisma } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 
 export default class BbpsPaymentRepository extends BaseContextClass {
-
-  private get table() {
-    return this.app.prisma.bbpsPayment;
+  async saveInit(
+    data: Omit<Prisma.BbpsPaymentUncheckedCreateInput, 'paymentId' | 'bbpsPaymentStatus'>,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsPayment> {
+    return tx.bbpsPayment.create({
+      data: { ...data, paymentId: randomUUID(), bbpsPaymentStatus: BbpsPaymentStatus.INIT },
+    });
   }
 
-  async save(data: Prisma.BbpsPaymentCreateInput): Promise<BbpsPayment> {
-    return this.table.upsert({
-      where: { paymentId: data.paymentId },
-      create: data,
-      update: data,
-    })
+  async updateStatus(
+    payment: BbpsPayment,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsPayment> {
+    const result = await tx.bbpsPayment.updateMany({
+      where: { paymentId: payment.paymentId, version: payment.version },
+      data: { bbpsPaymentStatus: payment.bbpsPaymentStatus, version: { increment: 1 } },
+    });
+    if (result.count === 0) {
+      throw new Error(`OptimisticLockConflict: bbps_payment ${payment.paymentId}`);
+    }
+    return tx.bbpsPayment.findUniqueOrThrow({ where: { paymentId: payment.paymentId } });
   }
 
-  async findByOrderId(orderId: string): Promise<BbpsPayment[]> {
-    return this.table.findMany({ where: { orderId } });
-  }
-
-  async queryBbpsPayment(params: { orderId?: string; paymentId?: string }): Promise<BbpsPayment[]> {
-    const where: Prisma.BbpsPaymentWhereInput = {};
-    if (params.orderId) where.orderId = params.orderId;
-    if (params.paymentId) where.paymentId = params.paymentId;
-    return this.table.findMany({ where });
+  async findByOrderId(
+    orderId: string,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsPayment[]> {
+    return tx.bbpsPayment.findMany({ where: { orderId } });
   }
 }

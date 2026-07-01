@@ -1,36 +1,35 @@
-import { BaseContextClass } from "egg";
-import type { BbpsOrder, Prisma } from "@prisma/client";
+import { BaseContextClass } from 'egg';
+import { BbpsOrderStatus } from '@prisma/client';
+import type { BbpsOrder, Prisma } from '@prisma/client';
 
 export default class BbpsOrderRepository extends BaseContextClass {
-  private get table() {
-    return this.app.prisma.bbpsOrder;
+  async saveInit(
+    data: Omit<Prisma.BbpsOrderUncheckedCreateInput, 'bbpsOrderStatus'>,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsOrder> {
+    return tx.bbpsOrder.create({
+      data: { ...data, bbpsOrderStatus: BbpsOrderStatus.INIT },
+    });
   }
 
-  async save(data: Prisma.BbpsOrderCreateInput): Promise<BbpsOrder> {
-    return this.table.upsert({
-      where: { orderId: data.orderId },
-      create: data,
-      update: data,
-    })
+  async updateStatus(
+    order: BbpsOrder,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsOrder> {
+    const result = await tx.bbpsOrder.updateMany({
+      where: { orderId: order.orderId, version: order.version },
+      data: { bbpsOrderStatus: order.bbpsOrderStatus, version: { increment: 1 } },
+    });
+    if (result.count === 0) {
+      throw new Error(`OptimisticLockConflict: bbps_order ${order.orderId}`);
+    }
+    return tx.bbpsOrder.findUniqueOrThrow({ where: { orderId: order.orderId } });
   }
 
-  async findByOrderId(orderId: string): Promise<BbpsOrder | null> {
-    return this.table.findUnique({
-      where: { orderId },
-    })
+  async findByRefId(
+    refId: string,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsOrder[]> {
+    return tx.bbpsOrder.findMany({ where: { refId } });
   }
-
-  async findByRefId(refId: string): Promise<BbpsOrder | null> {
-    return this.table.findUnique({
-      where: { refId },
-    })
-  }
-
-  async queryBbpsOrder(params: { orderId?: string; userGid?: string }): Promise<BbpsOrder[]> {
-    const where: Prisma.BbpsOrderWhereInput = {};
-    if (params.orderId) where.orderId = params.orderId;
-    if (params.userGid) where.userGid = params.userGid;
-    return this.table.findMany({ where });
-  }
-
 }

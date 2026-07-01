@@ -1,27 +1,35 @@
 import { BaseContextClass } from 'egg';
+import { BbpsRechargeStatus } from '@prisma/client';
 import type { BbpsRecharge, Prisma } from '@prisma/client';
 
 export default class BbpsRechargeRepository extends BaseContextClass {
-  private get table() {
-    return this.app.prisma.bbpsRecharge;
-  }
-
-  async save(data: Prisma.BbpsRechargeUncheckedCreateInput): Promise<BbpsRecharge> {
-    return this.table.upsert({
-      where: { rechargeId: data.rechargeId },
-      create: data,
-      update: data,
+  async saveInit(
+    data: Omit<Prisma.BbpsRechargeUncheckedCreateInput, 'bbpsRechargeStatus'>,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsRecharge> {
+    return tx.bbpsRecharge.create({
+      data: { ...data, bbpsRechargeStatus: BbpsRechargeStatus.INIT },
     });
   }
 
-  async findByOrderId(orderId: string): Promise<BbpsRecharge[]> {
-    return this.table.findMany({ where: { orderId } });
+  async updateStatus(
+    recharge: BbpsRecharge,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsRecharge> {
+    const result = await tx.bbpsRecharge.updateMany({
+      where: { rechargeId: recharge.rechargeId, version: recharge.version },
+      data: { bbpsRechargeStatus: recharge.bbpsRechargeStatus, version: { increment: 1 } },
+    });
+    if (result.count === 0) {
+      throw new Error(`OptimisticLockConflict: bbps_recharge ${recharge.rechargeId}`);
+    }
+    return tx.bbpsRecharge.findUniqueOrThrow({ where: { rechargeId: recharge.rechargeId } });
   }
 
-  async queryBbpsRecharge(params: { orderId?: string; rechargeId?: string }): Promise<BbpsRecharge[]> {
-    const where: Prisma.BbpsRechargeWhereInput = {};
-    if (params.orderId) where.orderId = params.orderId;
-    if (params.rechargeId) where.rechargeId = params.rechargeId;
-    return this.table.findMany({ where });
+  async findByOrderId(
+    orderId: string,
+    tx: Prisma.TransactionClient = this.app.prisma,
+  ): Promise<BbpsRecharge[]> {
+    return tx.bbpsRecharge.findMany({ where: { orderId } });
   }
 }
